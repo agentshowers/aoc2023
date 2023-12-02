@@ -33,6 +33,7 @@ class Day2 < Base
         set.each do |n, color|
           next if MAX[color] >= n.to_i
           valid = false
+          break
         end
         break unless valid
       end
