@@ -10,14 +10,6 @@ class Day1 < Base
     @input = Parser.lines(DAY, type)
   end
 
-  def one
-    super
-  end
-
-  def two
-    super
-  end
-
   private def solve_one
     sum = 0
     @input.each do |s|

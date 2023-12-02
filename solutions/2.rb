@@ -17,14 +17,6 @@ class Day2 < Base
     end
   end
 
-  def one
-    super
-  end
-
-  def two
-    super
-  end
-
   private def solve_one
     sum = 0
     @games.each_with_index do |game, index|
