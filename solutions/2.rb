@@ -36,7 +36,7 @@ class Day2 < Base
 
   private def solve_two
     sum = 0
-    @games.each_with_index do |game, index|
+    @games.each do |game|
       mins = {
         "blue" => 0,
         "green" => 0,
