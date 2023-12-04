@@ -8,5 +8,5 @@ type = ARGV[1] || "example"
 
 clazz = Object.const_get("Day#{ARGV[0]}")
 day = clazz.new(type)
-day.one
-day.two
+day.print_one
+day.print_two

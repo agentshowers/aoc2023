@@ -14,7 +14,7 @@ class Day4 < Base
     end
   end
 
-  private def solve_one
+  def one
     sum = 0
     @cards.each do |winning, my|
       winners = winning.select { |n| my.include?(n) }.length
@@ -23,7 +23,7 @@ class Day4 < Base
     sum
   end
 
-  private def solve_two
+  def two
     total_cards = Array.new(@cards.length) { 1 }
     @cards.each_with_index do |(winning, my), index|
       winners = winning.select { |n| my.include?(n) }.length

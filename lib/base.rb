@@ -5,11 +5,11 @@ class Base
     @input = Parser.lines(DAY, type)
   end
 
-  def one
-    puts solve_one
+  def print_one
+    puts one
   end
 
-  def two
-    puts solve_two
+  def print_two
+    puts two
   end
 end

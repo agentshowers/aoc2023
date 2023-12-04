@@ -12,7 +12,7 @@ class Day3 < Base
     @y = @matrix[0].length
   end
 
-  private def solve_one
+  def one
     sum = 0
     i = 0
     while i < @x
@@ -56,7 +56,7 @@ class Day3 < Base
     [number, used, j]
   end
 
-  private def solve_two
+  def two
     gears = {}
     i = 0
     while i < @x

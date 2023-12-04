@@ -10,7 +10,7 @@ class Day1 < Base
     @input = Parser.lines(DAY, type)
   end
 
-  private def solve_one
+  def one
     sum = 0
     @input.each do |s|
       l, r = digits(s)
@@ -19,7 +19,7 @@ class Day1 < Base
     sum
   end
 
-  private def solve_two
+  def two
     sum = 0
     @input.each do |s|
       l, r = digits(s, true)

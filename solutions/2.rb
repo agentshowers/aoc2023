@@ -17,7 +17,7 @@ class Day2 < Base
     end
   end
 
-  private def solve_one
+  def one
     sum = 0
     @games.each_with_index do |game, index|
       valid = true
@@ -34,7 +34,7 @@ class Day2 < Base
     sum
   end
 
-  private def solve_two
+  def two
     sum = 0
     @games.each do |game|
       mins = {
