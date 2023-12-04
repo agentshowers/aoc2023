@@ -20,7 +20,6 @@ class Day3 < Base
       while j < @y
         if @matrix[i][j].match?(/\d/)
           number, used, j = number_and_used(i, j)
-          #puts "#{number} is #{used}"
           sum += number if used
         else
           j += 1
