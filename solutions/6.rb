@@ -24,13 +24,13 @@ class Day6 < Base
   end
 
   private def winners(time, distance)
-    min = min_time(time, distance)
+    min = binary_solve(time, distance)
     half = time / 2
     winners = (half - min) * 2
     winners + (time.even? ? 1 : 2)
   end
 
-  private def min_time(time, distance)
+  private def binary_solve(time, distance)
     l = 0
     r = time / 2
 
@@ -46,6 +46,15 @@ class Day6 < Base
     end
 
     l * (l - mid) > distance ? l : r
+  end
+
+  private def math_solve(time, distance)
+    sq = Math.sqrt(time.pow(2) - 4*distance)
+    v1 = (-time - sq) / -2
+    v2 = (-time + sq) / -2
+    min = [v1, v2].min.ceil
+    min += 1 if min * (time - min) == distance
+    min
   end
 
 end
