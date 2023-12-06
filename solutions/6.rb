@@ -13,21 +13,14 @@ class Day6 < Base
 
   def one
     @times.map(&:to_i).zip(@distances.map(&:to_i)).inject(1) do |acc, (time, distance)|
-      acc * winners(time, distance)
+      acc * binary_solve(time, distance)
     end
   end
 
   def two
     time = @times.join().to_i
     distance = @distances.join().to_i
-    winners(time, distance)
-  end
-
-  private def winners(time, distance)
-    min = binary_solve(time, distance)
-    half = time / 2
-    winners = (half - min) * 2
-    winners + (time.even? ? 1 : 2)
+    binary_solve(time, distance)
   end
 
   private def binary_solve(time, distance)
@@ -45,16 +38,17 @@ class Day6 < Base
       end
     end
 
-    l * (l - mid) > distance ? l : r
+    min = l * (l - mid) > distance ? l : r
+    half = time / 2
+    winners = (half - min) * 2
+    winners + (time.even? ? 1 : 2)
   end
 
   private def math_solve(time, distance)
     sq = Math.sqrt(time.pow(2) - 4*distance)
     v1 = (-time - sq) / -2
     v2 = (-time + sq) / -2
-    min = [v1, v2].min.ceil
-    min += 1 if min * (time - min) == distance
-    min
+    v1.ceil - v2.floor - 1
   end
 
 end
