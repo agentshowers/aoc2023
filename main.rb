@@ -5,7 +5,7 @@ require 'optparse'
 require 'uri'
 require 'net/http'
 
-DAYS = 5
+DAYS = 6
 
 
 def solve(range)
