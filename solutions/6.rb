@@ -12,13 +12,9 @@ class Day6 < Base
   end
 
   def one
-    total = 1
-    split_times = @times.map(&:to_i)
-    split_distances = @distances.map(&:to_i)
-    split_times.each_with_index do |time, idx|
-      total *= winners(time, split_distances[idx])
+    @times.map(&:to_i).zip(@distances.map(&:to_i)).inject(1) do |acc, (time, distance)|
+      acc * winners(time, distance)
     end
-    total
   end
 
   def two
