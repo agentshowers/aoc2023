@@ -23,15 +23,9 @@ class Day5 < Base
   end
 
   def one
-    lowest = nil
-    @seeds.each do |seed|
-      value = seed
-      @mappings.each do |mapping|
-        value = mapping.find_value(value)
-      end
-      lowest = value if !lowest || value < lowest
-    end
-    lowest
+    @seeds.map do |seed|
+      @mappings.inject(seed) { |value, mapping| mapping.find_value(value) }
+    end.min
   end
 
   def two
