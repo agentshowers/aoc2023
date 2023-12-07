@@ -4,7 +4,17 @@ require "./lib/base.rb"
 
 class Day1 < Base
   DAY = 1
-  NUMBERS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+  REPLACEMENTS = {
+    "one" => "o1e",
+    "two" => "t2o",
+    "three" => "t3ree",
+    "four" => "f4ur",
+    "five" => "f5ve",
+    "six" => "s6x",
+    "seven" => "s7ven",
+    "eight" => "e8ght",
+    "nine" => "n9ne"
+  }
 
   def initialize(type = "example")
     @input = Parser.lines(DAY, type)
@@ -22,30 +32,41 @@ class Day1 < Base
   def two
     sum = 0
     @input.each do |s|
-      l, r = digits(s, true)
+      REPLACEMENTS.each do |k, v|
+        s.gsub!(k, v)
+      end
+      l, r = digits(s)
       sum += (l*10 + r)
     end
     sum
   end
 
-  private def digits(s, text = false)
-    left, right, l_digit, r_digit = nil
+  private def digits(s)
+    l_num = nil
+    i = 0
 
-    (1..9).to_a.each do |n|
-      l_idx = text ? s.index(/#{n}|#{NUMBERS[n-1]}/) : s.index(n.to_s)
-      r_idx = text ? s.rindex(/#{n}|#{NUMBERS[n-1]}/) : s.rindex(n.to_s)
-
-      if l_idx && (!left || l_idx < left)
-        left = l_idx
-        l_digit = n
-      end
-
-      if r_idx && (!right || r_idx > right)
-        right = r_idx
-        r_digit = n
+    while !l_num
+      if !l_num && s[i].match?(/[1-9]/)
+        l_num = s[i].to_i
+        break
+      else
+        i += 1
       end
     end
-    [l_digit, r_digit]
+
+    r_num = nil
+    i = s.length - 1
+
+    while !r_num
+      if !r_num && s[i].match?(/[1-9]/)
+        r_num = s[i].to_i
+        break
+      else
+        i -= 1
+      end
+    end
+
+    [l_num, r_num]
   end
 
 end
