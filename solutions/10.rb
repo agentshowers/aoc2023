@@ -6,27 +6,22 @@ class Day10 < Base
   DAY = 10
 
   def initialize(type = "example")
-    @map = {}
     lines = Parser.lines(DAY, type)
-    @size = lines[0].length
+    @row_size = lines[0].length
     @flat = lines.join.chars
     @flat.each_with_index do |char, pos|
       if char == "S"
         @start = pos
         char = infer_s(pos)
         @flat[pos] = char
-      end
-
-      if char != "."
-        a, b = neighbors(char, pos)
-        @map[pos] = [a, b]
+        break
       end
     end
-    calculate_distances
+    calculate_loop
   end
 
   def one
-    @distances.values.max
+    (@loop.keys.length / 2.0).ceil
   end
 
   def two
@@ -34,8 +29,7 @@ class Day10 < Base
     last_corner = nil
     inside = false
     @flat.each_with_index do |char, pos|
-      inside = false if pos % @size == 0
-      if !@distances[pos]
+      if !@loop[pos]
         count += 1 if inside
       else
         if char == "|"
@@ -54,24 +48,20 @@ class Day10 < Base
     count
   end
 
-  def calculate_distances
-    @distances = { @start => 0 }
-    to_visit = [@start]
-    while to_visit.length > 0
-      current = to_visit.shift
-      if @map[current]
-        neighbors = @map[current]
-        neighbors.each do |n|
-          next if @distances[n]
-          @distances[n] = @distances[current] + 1
-          to_visit << n
-        end
-      end
+  def calculate_loop
+    @loop = { @start => true }
+    cur_pos = neighbors(@start).first
+    prev_pos = @start
+    while cur_pos != @start
+      @loop[cur_pos] = true
+      next_pos = (neighbors(cur_pos) - [prev_pos]).first
+      prev_pos = cur_pos
+      cur_pos = next_pos
     end
   end
 
-  def neighbors(char, pos)
-    case char
+  def neighbors(pos)
+    case @flat[pos]
     when "|"
       [north(pos), south(pos)]
     when "-"
@@ -102,11 +92,11 @@ class Day10 < Base
   end
 
   def north(pos)
-    pos - @size
+    pos - @row_size
   end
 
   def south(pos)
-    pos + @size
+    pos + @row_size
   end
 
   def east(pos)
