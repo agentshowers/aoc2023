@@ -6,11 +6,25 @@ class Day11 < Base
   DAY = 11
 
   def initialize(type = "example")
-    lines = Parser.lines(DAY, type)
+    @input = Parser.lines(DAY, type)
 
+    find_expansions
+    find_galaxies
+    calculate_distances
+  end
+
+  def one
+    @xy_sum + @exp_sum
+  end
+
+  def two
+    @xy_sum + @exp_sum * (1000000 - 1)
+  end
+
+  def find_expansions
     @empty_rows = []
     acc = 0
-    lines.each_with_index do |l, i|
+    @input.each_with_index do |l, i|
       n = l.gsub("#", "1").gsub(".", "0").to_i(2)
       @empty_rows << i if n == 0
       acc = acc | n
@@ -20,9 +34,11 @@ class Day11 < Base
     acc.to_s(2).chars.each_with_index do |c, i|
       @empty_columns << i if c == "0"
     end
+  end
 
+  def find_galaxies
     @galaxies = []
-    lines.each_with_index do |l, i|
+    @input.each_with_index do |l, i|
       l.chars.each_with_index do |char, j|
         if char == "#"
           row_exps = @empty_rows.select { |n| n < i }.count
@@ -31,35 +47,22 @@ class Day11 < Base
         end
       end
     end
-
-    calculate_distances
-  end
-
-  def one
-    @sum_one
-  end
-
-  def two
-    @sum_two
   end
 
   def calculate_distances
-    @sum_one = 0
-    @sum_two = 0
-    @galaxies.each_with_index do |galaxy, idx|
-      (idx+1..@galaxies.length - 1).each do |j|
-        real, exp = distance(*galaxy, *@galaxies[j])
-        @sum_one += real + exp
-        @sum_two += real + exp * (1000000 - 1)
-      end
-    end
+    @xy_sum = distance_sum(@galaxies.map { _1[0] } ) + distance_sum(@galaxies.map { _1[1] } )
+    @exp_sum = distance_sum(@galaxies.map { _1[2] } ) + distance_sum(@galaxies.map { _1[3] } )
   end
 
-  def distance(a_x, a_y, a_rexp, a_cexp, b_x, b_y, b_rexp, b_cexp)
-    x_diff = (a_x - b_x).abs
-    y_diff = (a_y - b_y).abs
-    rexp_diff = (a_rexp - b_rexp).abs
-    cexp_diff = (a_cexp - b_cexp).abs
-    [x_diff + y_diff, rexp_diff + cexp_diff]
+  def distance_sum(arr)
+    arr.sort!
+
+    res = 0
+    sum = 0
+    arr.each_with_index do |n, idx|
+      res += (n * idx - sum)
+      sum += n
+    end
+    res
   end
 end
