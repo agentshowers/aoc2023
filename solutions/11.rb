@@ -28,29 +28,34 @@ class Day11 < Base
         end
       end
     end
+    calculate_distances
   end
 
   def one
-    @galaxies.each_with_index.map do |n, idx|
-      (idx+1..@galaxies.length - 1).map do |j|
-        distance(*n, *@galaxies[j], 2)
-      end.sum
-    end.sum
+    @sum_one
   end
 
   def two
-    @galaxies.each_with_index.map do |n, idx|
-      (idx+1..@galaxies.length - 1).map do |j|
-        distance(*n, *@galaxies[j], 1000000)
-      end.sum
-    end.sum
+    @sum_two
   end
 
-  def distance(a_x, a_y, a_rexp, a_cexp, b_x, b_y, b_rexp, b_cexp, multiplier)
+  def calculate_distances
+    @sum_one = 0
+    @sum_two = 0
+    @galaxies.each_with_index do |n, idx|
+      (idx+1..@galaxies.length - 1).each do |j|
+        real, exp = distance(*n, *@galaxies[j])
+        @sum_one += real + exp
+        @sum_two += real + exp * (1000000 - 1)
+      end
+    end
+  end
+
+  def distance(a_x, a_y, a_rexp, a_cexp, b_x, b_y, b_rexp, b_cexp)
     x_diff = (a_x - b_x).abs
     y_diff = (a_y - b_y).abs
-    rexp_diff = (a_rexp - b_rexp).abs * (multiplier - 1)
-    cexp_diff = (a_cexp - b_cexp).abs * (multiplier - 1)
-    x_diff + y_diff + rexp_diff + cexp_diff
+    rexp_diff = (a_rexp - b_rexp).abs
+    cexp_diff = (a_cexp - b_cexp).abs
+    [x_diff + y_diff, rexp_diff + cexp_diff]
   end
 end
