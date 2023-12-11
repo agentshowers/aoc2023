@@ -26,22 +26,20 @@ class Day9 < Base
 
   def extrapolate(numbers)
     forward = 0
-    firsts = []
+    backward = 0
+    back_bit = 1
     stop = false
+
     while !stop
       stop = true
-      firsts << numbers[0]
+      backward += numbers[0] * back_bit
+      back_bit *= -1
       (1..numbers.length-1).each do |n|
         diff = numbers[n] - numbers[n-1]
         numbers[n-1] = diff
         stop = false if diff != 0
       end
       forward += numbers.pop
-    end
-    
-    backward = firsts.pop
-    while firsts.length > 0
-      backward = firsts.pop - backward
     end
 
     [backward, forward]
