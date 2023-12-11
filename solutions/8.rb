@@ -19,44 +19,34 @@ class Day8 < Base
       orig, dests = lines[n].split(" = ")
       @map[orig] = dests.gsub("(", "").gsub(")", "").split(", ")
     end
+
+    calculate_loops
   end
 
   def one
+    @loop_sizes["AAA"]
+  end
+
+  def two
+    @loop_sizes.values.reduce(1, :lcm)
+  end
+
+  def calculate_loops
+    @loop_sizes = {}
+    @map.keys.select { |k| k.end_with?("A") }.each do |s|
+      @loop_sizes[s] = loop_size(s)
+    end
+  end
+
+  def loop_size(start)
     count = 0
-    current = "AAA"
     i = 0
-    while current != "ZZZ"
+    while !start.end_with?("Z")
       next_i = @instructions[i]
-      current = @map[current][next_i]
+      start = @map[start][next_i]
       count += 1
       i = (i + 1) % @instructions.length
     end
     count
-  end
-
-  def two
-    if @type == "example"
-      lines = File.readlines("example/8b.txt", chomp: true)
-      parse(lines)
-    end
-    starts = @map.keys.select { |k| k.end_with?("A") }
-
-    values = starts.map do |s|
-      match = nil
-      i = 0
-      j = 0
-      while !match
-        next_i = @instructions[i]
-        s = @map[s][next_i]
-        i = (i + 1) % @instructions.length
-        j += 1
-        if s.end_with?("Z")
-          match = j
-        end
-      end
-      match
-    end
-
-    values.reduce(1, :lcm)
   end
 end
