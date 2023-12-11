@@ -7,17 +7,20 @@ class Day11 < Base
 
   def initialize(type = "example")
     lines = Parser.lines(DAY, type)
-    acc = 0
+
     @empty_rows = []
+    acc = 0
     lines.each_with_index do |l, i|
       n = l.gsub("#", "1").gsub(".", "0").to_i(2)
       @empty_rows << i if n == 0
       acc = acc | n
     end
+
     @empty_columns = []
     acc.to_s(2).chars.each_with_index do |c, i|
       @empty_columns << i if c == "0"
     end
+
     @galaxies = []
     lines.each_with_index do |l, i|
       l.chars.each_with_index do |char, j|
@@ -28,6 +31,7 @@ class Day11 < Base
         end
       end
     end
+
     calculate_distances
   end
 
@@ -42,9 +46,9 @@ class Day11 < Base
   def calculate_distances
     @sum_one = 0
     @sum_two = 0
-    @galaxies.each_with_index do |n, idx|
+    @galaxies.each_with_index do |galaxy, idx|
       (idx+1..@galaxies.length - 1).each do |j|
-        real, exp = distance(*n, *@galaxies[j])
+        real, exp = distance(*galaxy, *@galaxies[j])
         @sum_one += real + exp
         @sum_two += real + exp * (1000000 - 1)
       end
