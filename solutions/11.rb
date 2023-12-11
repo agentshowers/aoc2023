@@ -21,7 +21,11 @@ class Day11 < Base
     @galaxies = []
     lines.each_with_index do |l, i|
       l.chars.each_with_index do |char, j|
-        @galaxies << [i, j] if char == "#"
+        if char == "#"
+          row_exps = @empty_rows.select { |n| n < i }.count
+          col_exps = @empty_columns.select { |n| n < j }.count
+          @galaxies << [i, j, row_exps, col_exps]
+        end
       end
     end
   end
@@ -42,11 +46,11 @@ class Day11 < Base
     end.sum
   end
 
-  def distance(ax, ay, bx, by, multiplier)
-    xs = [ax, bx].sort
-    ys = [ay, by].sort
-    x_diff = xs[1] - xs[0] + (@empty_rows.select { |r| r > xs[0] && r < xs[1] }.count * (multiplier - 1))
-    y_diff = ys[1] - ys[0] + (@empty_columns.select { |r| r > ys[0] && r < ys[1] }.count * (multiplier - 1))
-    x_diff + y_diff
+  def distance(a_x, a_y, a_rexp, a_cexp, b_x, b_y, b_rexp, b_cexp, multiplier)
+    x_diff = (a_x - b_x).abs
+    y_diff = (a_y - b_y).abs
+    rexp_diff = (a_rexp - b_rexp).abs * (multiplier - 1)
+    cexp_diff = (a_cexp - b_cexp).abs * (multiplier - 1)
+    x_diff + y_diff + rexp_diff + cexp_diff
   end
 end
