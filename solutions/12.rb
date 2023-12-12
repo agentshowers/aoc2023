@@ -7,9 +7,9 @@ class Day12 < Base
 
   def initialize(type = "example")
     @lines = Parser.lines(DAY, type)
-    #@solutions = File.readlines("pyout.txt", chomp: true).map(&:to_i)
     @combos_memo = {}
     @single_combos_memo = {}
+    @breaks_memo = {}
   end
 
   def one
@@ -21,10 +21,9 @@ class Day12 < Base
 
   def two
     groups = @lines.map { |line| parse(line, 5) }
-    groups.map do |g| 
-      v = solve(*g)
-      puts v
-      v
+    groups.each_with_index.map do |g, i| 
+      puts i
+      solve(*g)
     end.sum
   end
 
@@ -38,12 +37,20 @@ class Day12 < Base
   end
 
   def solve(str, sizes)
-    breaks = size_breaks(str, sizes)
+    breaks = cached_size_breaks(str, sizes)
     breaks.map do |b|
       b.zip(str).map do |ns, s|
         cached_combos(s, ns)
       end.inject(:*)
     end.sum
+  end
+
+  def cached_size_breaks(str, sizes)
+    key = "#{str.map(&:length).join(",")}-#{sizes.join(",")}"
+    return @breaks_memo[key] if @breaks_memo[key]
+    res = size_breaks(str, sizes)
+    @breaks_memo[key] = res
+    res
   end
 
   def size_breaks(str, sizes)
@@ -57,12 +64,12 @@ class Day12 < Base
     rem = str[0].length
     i = 0
     solutions = []
-    sub_solutions = size_breaks(str[1..-1], sizes)
+    sub_solutions = cached_size_breaks(str[1..-1], sizes)
     sub_solutions.each do |sub|
       solutions << ([[]] + sub)
     end
     while i < sizes.length && rem >= sizes[i]
-      sub_solutions = size_breaks(str[1..-1], sizes[i+1..-1])
+      sub_solutions = cached_size_breaks(str[1..-1], sizes[i+1..-1])
       sub_solutions.each do |sub|
         solutions << ([sizes[0..i]] + sub)
       end
@@ -110,6 +117,7 @@ class Day12 < Base
   def cached_single_combo(str, n)
     key = "#{str}-#{n}"
     return @single_combos_memo[key] if @single_combos_memo[key]
+
     res = single_combo(str, n)
     @single_combos_memo[key] = res
     res
