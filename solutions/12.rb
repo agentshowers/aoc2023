@@ -15,7 +15,10 @@ class Day12 < Base
   end
 
   def one
-    @groups.map { |g| solve(*g) }.sum
+    @groups.map do |g| 
+      v = solve(*g)
+      v
+    end.sum
   end
 
   def two
@@ -60,42 +63,36 @@ class Day12 < Base
   def combos(str, ns)
     return 0 if str.include?("#") && ns.length == 0
     return 0 if str.length < (ns.sum + ns.length - 1)
+    return 1 if ns.length == 0
     return single_combo(str, ns[0]) if ns.length == 1
-
-    1
+  
+    n = ns[0]
+    rem = ns[1..-1]
+    if str[0] == "#"
+      return 0 if str[n] == "#"
+      combos(str[n+1..-1], ns[1..-1])
+    else
+      left_hash = str.index("#")
+      sum = 0
+      i = n
+      loop do
+        if str[i] != "#"
+          sum += (single_combo(str[i-n..i-1], n) * combos(str[i+1..-1], rem))
+        end
+        i += 1
+        break if left_hash && i - n > left_hash
+        break if i > str.length - 2
+      end
+      sum
+    end
   end
- 
-
-  # def group_perms(springs, broken)
-  #   return 0 if springs.length == 0 && broken.length > 0
-
-  #   spring = springs[0]
-  #   n = broken[0]
-  #   if spring.length < n
-  #     group_perms(springs[1..-1], broken)
-  #   elsif spring.length < n + 2
-  #     local_perms = combos(spring, n)
-  #     local_perms = spring.length - n + 1
-  #     local_perms * group_perms(springs[1..-1], broken[1..-1])
-  #   elsif spring[0] == "#"
-  #     new_spring = spring[n+1..-1]
-  #     new_springs = new_spring ? [new_spring] + springs[1..-1] : springs[1..-1]
-  #     group_perms(springs[1..-1], broken[1..-1])
-  #   else
-  #     while spring[n] == "#" { n += 1 }
-  #     local_perms = combos(spring[0..n-1], n)
-  #     new_springs = new_spring ? [new_spring] + springs[1..-1] : springs[1..-1]
-  #     group_perms(springs[1..-1], broken[1..-1])
-
-  #   end
-    
-  # end
 
   def single_combo(str, n)
     return 1 if str.length == n
     l_idx = str.index("#")
     return str.length - n + 1 unless l_idx
     r_idx = str.rindex("#")
+    return 0 if r_idx - l_idx + 1 > n
     used = r_idx - l_idx + 1
     rem = n - used
     left_moves = [l_idx, used].min
