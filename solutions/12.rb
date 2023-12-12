@@ -32,7 +32,10 @@ class Day12 < Base
   end
 
   def size_breaks(str, sizes)
-    return [[sizes]] if sizes.length == 1 && str.length == 1
+    if sizes.length == 1 && str.length == 1
+      return [[sizes]] if str[0].length >= sizes[0]
+      return []
+    end
     return [] if sizes.length > 0 && str.length == 0
     return [Array.new(str.length) { [].dup }] if sizes.length == 0
     
@@ -56,6 +59,7 @@ class Day12 < Base
 
   def combos(str, ns)
     return 0 if str.include?("#") && ns.length == 0
+    return 0 if str.length < (ns.sum + ns.length - 1)
     return single_combo(str, ns[0]) if ns.length == 1
 
     1
