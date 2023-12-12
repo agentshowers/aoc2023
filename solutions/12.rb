@@ -7,9 +7,6 @@ class Day12 < Base
 
   def initialize(type = "example")
     @lines = Parser.lines(DAY, type)
-    @combos_memo = {}
-    @single_combos_memo = {}
-    @breaks_memo = {}
     @memo = {}
   end
 
@@ -45,7 +42,7 @@ class Day12 < Base
   end
 
   def inner_solve(springs, sizes)
-    return 0 if springs.any? { |s| s.include?("#") } && sizes.length == 0
+    return 0 if springs.select { |s| s.include?("#") }.length > sizes.length
     return 0 if springs.length == 0 && sizes.length > 0
     return 1 if sizes.length == 0
     
