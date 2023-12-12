@@ -6,8 +6,8 @@ class Day12 < Base
   DAY = 12
 
   def initialize(type = "example")
-    lines = Parser.lines(DAY, type)
-    @groups = lines.map do |line|
+    @lines = Parser.lines(DAY, type)
+    @groups = @lines.map do |line|
       springs, ns = line.split(" ")
       split_springs = springs.gsub(".", " ").strip.split(" ").map(&:strip)
       [split_springs, ns.split(",").map(&:to_i)]
@@ -15,10 +15,14 @@ class Day12 < Base
   end
 
   def one
-    @groups.map do |g| 
+    #s = ""
+    @groups.each_with_index.map do |g, i| 
       v = solve(*g)
+      #s += "#{@lines[i]} #{g.to_s} : #{v}\n"
       v
     end.sum
+    #File.write("output.txt", s)
+    #1
   end
 
   def two
@@ -95,7 +99,7 @@ class Day12 < Base
     return 0 if r_idx - l_idx + 1 > n
     used = r_idx - l_idx + 1
     rem = n - used
-    left_moves = [l_idx, used].min
+    left_moves = [l_idx, n - used].min
     right_moves = [str.length - r_idx - 1, n - used].min
     [left_moves, right_moves].min + 1
   end
