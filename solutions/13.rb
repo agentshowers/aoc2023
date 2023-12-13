@@ -6,9 +6,9 @@ class Day13 < Base
   DAY = 13
 
   def initialize(type = "example")
-    @patterns = []
-    input = Parser.read(DAY, type)
-    input.split("\n\n").each do |p|
+    @folds = []
+
+    Parser.read(DAY, type).split("\n\n").each do |p|
       rows = []
       columns = Array.new(p.index("\n")) { 0 }
       p.split("\n").each_with_index do |line, i|
@@ -18,55 +18,32 @@ class Day13 < Base
           columns[j] += b.to_i * 2.pow(i)
         end
       end
-      @patterns << [rows, columns]
+      @folds << [fold_diffs(rows), fold_diffs(columns)]
     end
-
   end
 
   def one
     sum = 0
-    @patterns.each do |rs, cs|
-      row_mirrow = find_mirror(rs)
-      if row_mirrow
-        sum += 100 * row_mirrow
+    @folds.each do |rs, cs|
+      if rs.index(:none)
+        sum += 100 * (rs.index(:none) + 1)
       else
-        sum += find_mirror(cs)
+        sum += (cs.index(:none) + 1)
       end
-    rescue StandardError
-      puts "#{rs} #{cs}\n"
     end
     sum
   end
 
   def two
     sum = 0
-    @patterns.each do |rs, cs|
-      row_mirrow = find_candidate(rs)
-      if row_mirrow
-        sum += 100 * row_mirrow
+    @folds.each do |rs, cs|
+      if rs.index(:one)
+        sum += 100 * (rs.index(:one) + 1)
       else
-        sum += find_candidate(cs)
+        sum += (cs.index(:one) + 1)
       end
-    rescue StandardError
-      puts "#{rs} #{cs}\n"
     end
     sum
-  end
-
-  def find_mirror(ns)
-    diffs = fold_diffs(ns)
-    diffs.each_with_index do |diff, idx|
-      return idx + 1 if diff.length == 0
-    end
-    nil
-  end
-
-  def find_candidate(ns)
-    diffs = fold_diffs(ns)
-    diffs.each_with_index do |diff, idx|
-      return idx + 1 if diff.length == 1 && power_of_two?(diff[0])
-    end
-    nil
   end
 
   def power_of_two?(n)
@@ -74,19 +51,25 @@ class Day13 < Base
   end
 
   def fold_diffs(ns)
-    i = 0
     res = []
-    while i <= ns.length - 2
+    (0..ns.length-2).each do |i|
       l = i
       r = i + 1
-      diffs = []
+      diff_state = :none
       while l >= 0 && r < ns.length
-        diffs << (ns[l] - ns[r]).abs if ns[l] != ns[r]
+        diff = (ns[l] - ns[r]).abs
+        if diff != 0
+          if diff_state != :none || !power_of_two?(diff)
+            diff_state = :multiple
+            break
+          else
+            diff_state = :one
+          end
+        end
         l -= 1
         r += 1
       end
-      i += 1
-      res << diffs
+      res << diff_state
     end
     res
   end
