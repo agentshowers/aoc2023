@@ -55,17 +55,16 @@ class Day13 < Base
 
   def find_mirror(ns)
     diffs = fold_diffs(ns)
-    if diffs.index(0)
-      diffs.index(0) + 1
-    else
-      nil
+    diffs.each_with_index do |diff, idx|
+      return idx + 1 if diff.length == 0
     end
+    nil
   end
 
   def find_candidate(ns)
     diffs = fold_diffs(ns)
-    diffs.each_with_index do |diff, index|
-      return index + 1 if power_of_two?(diff)
+    diffs.each_with_index do |diff, idx|
+      return idx + 1 if diff.length == 1 && power_of_two?(diff[0])
     end
     nil
   end
@@ -75,30 +74,19 @@ class Day13 < Base
   end
 
   def fold_diffs(ns)
-    sum = []
-    acc = 0
-    ns.each do |n|
-      acc += n
-      sum << acc
-    end
-    
     i = 0
     res = []
     while i <= ns.length - 2
-      if i >= (ns.length / 2.0).floor
-        l = (i+1) * 2 - ns.length
-        r = ns.length - 1
-      else
-        l = 0
-        r = (i * 2) + 1
+      l = i
+      r = i + 1
+      diffs = []
+      while l >= 0 && r < ns.length
+        diffs << (ns[l] - ns[r]).abs if ns[l] != ns[r]
+        l -= 1
+        r += 1
       end
-  
-      l_sum = sum[i] - (l == 0 ? 0 : sum[l-1])
-      r_sum = sum[r] - sum[i]
-    
-      diff = (l_sum - r_sum).abs
-      res << diff
       i += 1
+      res << diffs
     end
     res
   end
