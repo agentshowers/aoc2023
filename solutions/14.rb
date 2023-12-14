@@ -12,20 +12,6 @@ class Day14 < Base
   end
 
   def one
-    # n = @map.length
-    # sums = Array.new(n) { 0 }
-    # spots = Array.new(n) { 0 }
-    # @map.each_with_index do |line, i|
-    #   line.chars.each_with_index do |c, j|
-    #     if c == "O"
-    #       sums[j] += (n - spots[j])
-    #       spots[j] += 1
-    #     elsif c == "#"
-    #       spots[j] = i + 1
-    #     end
-    #   end
-    # end
-    # sums.sum
     vertical_move(0, @rows, 1)
     
     calculate_load
@@ -33,27 +19,25 @@ class Day14 < Base
 
   def two
     results = {}
+    values = []
     i = 1
     loop_start = nil
     loop_size = nil
     while !loop_start
       cycle
-      res = calculate_load
-      if results[res]
-        loop_start = results[res]
-        loop_size = i - results[res]
+      hash = map_hash
+      if results[hash]
+        loop_start = results[hash]
+        loop_size = i - results[hash]
       else
-        results[res] = i
+        results[hash] = i
+        values << calculate_load
       end
       i += 1
     end
-    # 200.times do |i|
-    #   cycle
-    #   puts "#{calculate_load}"
-    # end    
 
-    (1000000000 - loop_size)
-    #@input[0]
+    rem = (1000000000 - loop_start) % loop_size
+    values[loop_start + rem - 1]
   end
 
   def cycle
@@ -109,5 +93,11 @@ class Day14 < Base
     @map.each_with_index.map do |line, idx|
       line.chars.select { |c| c == "O" }.length * (@map.length - idx)
     end.sum
+  end
+
+  def map_hash
+    @map.each_with_index do |line|
+      line.gsub("O", "0").gsub(/\.|#/, "1").to_i(2).to_s
+    end.join("-")
   end
 end
