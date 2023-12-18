@@ -1,6 +1,7 @@
 require "./lib/parser.rb"
 require "./lib/utils.rb"
 require "./lib/base.rb"
+require "algorithms"
 
 class Day17 < Base
   DAY = 17
@@ -14,67 +15,65 @@ class Day17 < Base
   end
 
   def one
-    queue = ["0,1,0,1", "1,0,1,0"]
-    mins = {
+    solve(1, 3)
+  end
+
+  def two
+    solve(4, 10)
+  end
+
+  def solve(min, max)
+    @queue = Containers::PriorityQueue.new
+    @queue.push("0,1,0,1", 0)
+    @queue.push("1,0,1,0", 0)
+    @mins = {
       "0,1,0,1" => 0,
       "1,0,1,0" => 0
     }
-    visited = {}
-    best = (2**(0.size * 8 -2) -1)
-    i = 0
+    @visited = {}
+    @best = (2**(0.size * 8 -2) -1)
 
-    while queue.length > 0
-      i += 1
-      puts "visited #{i} keys"
-      key = queue.pop
-      visited[key] = true
-      cur = mins[key]
-      #puts key
-      break if cur >= best
-      3.times do
-        x, y, x_delta, y_delta = key.split(",").map(&:to_i)
+    while @queue.size > 0
+      key = @queue.pop
+      next if @visited[key]
+      @visited[key] = true
+      cur = @mins[key]
+      break if cur >= @best
+      x, y, x_delta, y_delta = key.split(",").map(&:to_i)
+      (min - 1).times do
+        cur += @map[x][y]
+        x += x_delta
+        y += y_delta
+      end
+      (max - min + 1).times do
         cur += @map[x][y]
         if x == @n_rows-1 && y == @n_cols - 1
-          best = [cur, best].min
+          @best = [cur, @best].min
           break
         end
-        x1 = x + y_delta
-        y1 = y + x_delta
-        k1 = [x1, y1, y_delta, x_delta].join(",")
-        if !oob(x1, y1) && !visited[k1]
-          if mins[k1]
-            mins[k1] = [mins[k1], cur].min
-          else
-            mins[k1] = cur
-          end
-          queue << k1
-        end
-
-        x2 = x - y_delta
-        y2 = y - x_delta
-        k2 = [x2, y2, -y_delta, -x_delta].join(",")
-        if !oob(x2, y2) && !visited[k2]
-          if mins[k2]
-            mins[k2] = [mins[k2], cur].min
-          else
-            mins[k2] = cur
-          end
-          queue << k2
-        end
+        visit(x, y, y_delta, x_delta, cur) if !oob(x + min*y_delta, y + min*x_delta)
+        visit(x, y, -y_delta, -x_delta, cur) if !oob(x - min*y_delta, y - min*x_delta)
 
         x += x_delta
         y += y_delta
         break if oob(x, y)
       end
-
-      queue = queue.uniq.sort_by { |x| mins[x] }
     end
-    best
+    @best
   end
 
-  def two
-    -1
-    #@input[0]
+  def visit(x, y, x_delta, y_delta, cur)
+    x += x_delta
+    y += y_delta
+    key = [x, y, x_delta, y_delta].join(",")
+    if !@visited[key]
+      if @mins[key]
+        @mins[key] = [@mins[key], cur].min
+      else
+        @mins[key] = cur
+      end
+      @queue.push(key, -@mins[key])
+    end
   end
 
   def oob(x, y)

@@ -5,7 +5,7 @@ require 'optparse'
 require 'uri'
 require 'net/http'
 
-DAYS = 16
+DAYS = 18
 
 def solve(range)
   range.map do |n|
