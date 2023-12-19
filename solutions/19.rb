@@ -10,12 +10,12 @@ class Day19 < Base
     @workflows = {}
     workflows.split("\n").map do |workflow|
       key, conditions = /(\w+){(.*)}/.match(workflow).captures
-      @workflows[key] = conditions.split(",").map do |condition|
-        if !condition.include?(":")
-          [nil, condition]
+      @workflows[key] = conditions.split(",").map do |str|
+        if !str.include?(":")
+          [nil, str]
         else
-          str, outcome = condition.split(":")
-          match_data = /(\w+)([<>])(\d+)/.match(str)
+          cond_str, outcome = str.split(":")
+          match_data = /(\w+)([<>])(\d+)/.match(cond_str)
           variable, signal, value = match_data.captures
           condition = Condition.new(variable, signal, value.to_i)
           [condition, outcome]
@@ -37,31 +37,23 @@ class Day19 < Base
   end
 
   def two
-    @rejection_ranges = []
-    find_rejections("in", [])
-    tot = @rejection_ranges.map do |category|
-      category.values.map do |r|
-        r["max"] - r["min"] + 1
-      end.inject(:*)
-    end.sum
-    4000.pow(4) - tot
+    4000.pow(4) - count_rejections("in", [])
   end
 
-  def find_rejections(key, conditions)
+  def count_rejections(key, conditions)
+    total = 0
     @workflows[key].each do |condition, outcome|
       if outcome == "R"
-        ranges = get_ranges((conditions + [condition]).compact)
-        if !ranges.values.any? { |r| r["min"] > r["max"] }
-          @rejection_ranges << ranges
-        end
+        total += rejected_combinations((conditions + [condition]).compact)
       elsif outcome != "A"
-        find_rejections(outcome, conditions.dup + [condition])
+        total += count_rejections(outcome, conditions.dup + [condition])
       end
       conditions << condition.reverse if condition
     end
+    total
   end
 
-  def get_ranges(conditions)
+  def rejected_combinations(conditions)
     ranges = {
       "x" => { "min" => 1, "max" => 4000 },
       "m" => { "min" => 1, "max" => 4000 },
@@ -82,7 +74,9 @@ class Day19 < Base
       end
     end
 
-    ranges
+    ranges.values.map do |range|
+      [range["max"] - range["min"] + 1, 0].max
+    end.inject(:*)
   end
 
   def accepted?(part)
