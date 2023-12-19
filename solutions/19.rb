@@ -1,0 +1,121 @@
+require "./lib/parser.rb"
+require "./lib/utils.rb"
+require "./lib/base.rb"
+
+class Day19 < Base
+  DAY = 19
+
+  def initialize(type = "example")
+    workflows, parts = Parser.read(DAY, type).split("\n\n")
+    @workflows = {}
+    workflows.split("\n").map do |workflow|
+      key, conditions = /(\w+){(.*)}/.match(workflow).captures
+      @workflows[key] = conditions.split(",").map do |condition|
+        if !condition.include?(":")
+          [nil, condition]
+        else
+          str, outcome = condition.split(":")
+          match_data = /(\w+)([<>])(\d+)/.match(str)
+          variable, signal, value = match_data.captures
+          condition = Condition.new(variable, signal, value.to_i)
+          [condition, outcome]
+        end
+      end
+    end
+    @parts = parts.split("\n").map do |part|
+      part.gsub(/[{}]/,"").split(",").map do |x|
+        k,v = x.split("=")
+        [k, v.to_i]
+      end.to_h
+    end
+  end
+
+  def one
+    @parts.map do |part|
+      accepted?(part) ? part.values.sum : 0
+    end.sum
+  end
+
+  def two
+    @rejection_ranges = []
+    find_rejections("in", [])
+    tot = @rejection_ranges.map do |category|
+      category.values.map do |r|
+        r["max"] - r["min"] + 1
+      end.inject(:*)
+    end.sum
+    4000.pow(4) - tot
+  end
+
+  def find_rejections(key, conditions)
+    @workflows[key].each do |condition, outcome|
+      if outcome == "R"
+        ranges = get_ranges((conditions + [condition]).compact)
+        if !ranges.values.any? { |r| r["min"] > r["max"] }
+          @rejection_ranges << ranges
+        end
+      elsif outcome != "A"
+        find_rejections(outcome, conditions.dup + [condition])
+      end
+      conditions << condition.reverse if condition
+    end
+  end
+
+  def get_ranges(conditions)
+    ranges = {
+      "x" => { "min" => 1, "max" => 4000 },
+      "m" => { "min" => 1, "max" => 4000 },
+      "a" => { "min" => 1, "max" => 4000 },
+      "s" => { "min" => 1, "max" => 4000 },
+    }
+
+    conditions.each do |condition|
+      case condition.signal
+      when "<"
+        ranges[condition.variable]["max"] = condition.value - 1
+      when "<="
+        ranges[condition.variable]["max"] = condition.value
+      when ">"
+        ranges[condition.variable]["min"] = condition.value + 1
+      when ">="
+        ranges[condition.variable]["min"] = condition.value
+      end
+    end
+
+    ranges
+  end
+
+  def accepted?(part)
+    current = "in"
+
+    while !["A", "R"].include?(current)
+      @workflows[current].each do |condition, outcome|
+        if !condition || condition.apply?(part)
+          current = outcome
+          break
+        end
+      end
+    end
+
+    current == "A"
+  end
+end
+
+class Condition
+  attr_reader :variable, :signal, :value
+
+  def initialize(variable, signal, value)
+    @variable = variable
+    @signal = signal
+    @value = value
+  end
+
+  def apply?(part)
+    part[@variable].send(@signal, @value)
+  end
+
+  def reverse
+    reverse_condition = @signal == "<" ? ">=" : "<="
+    Condition.new(@variable, reverse_condition, @value)
+  end
+end
