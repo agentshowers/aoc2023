@@ -82,7 +82,6 @@ class Day22 < Base
       @supporters[under_idx] << idx
     end
     @supports[idx] = under
-    #puts "#{idx} supported by #{under}"
     (min_z..max_z).each do |z|
       if @stack.length <= z
         @stack << Array.new(MAX) { Array.new(MAX) { EMPTY } }
