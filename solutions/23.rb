@@ -23,11 +23,12 @@ class Day23 < Base
 
   def longest_path(visited, node, directed)
     return 0 if terminal?(*node)
-    visited[node] = true
+    return @last_distance if node == @pre_terminal
 
+    visited[node] = true
     max = 0
-    @junctions[node].each do |junction, dist, allowed|
-      next unless !directed || allowed
+    @junctions[node].each do |junction, dist, slope_forward|
+      next unless !directed || slope_forward
       next if visited[junction]
       subpath = longest_path(visited, junction, directed)
       max = (subpath + dist) if (subpath + dist > max)
@@ -35,6 +36,21 @@ class Day23 < Base
 
     visited[node] = false
     max
+  end
+
+  def find_junctions
+    @junctions = {}
+    @junctions[[0,1]] = []
+    (1..@n_rows-2).each do |x|
+      (1..@n_cols-2).each do |y|
+        neighbors = 0
+        [[x-1, y], [x+1, y], [x, y-1], [x, y+1]].map do |nx, ny|
+          neighbors += 1 if @map[nx][ny] != "#"
+        end
+        @junctions[[x,y]] = [] if neighbors > 2
+      end
+    end
+    @junctions[[@n_rows - 1, @n_cols - 2]] = []
   end
 
   def generate_graph
@@ -62,21 +78,7 @@ class Day23 < Base
     end
 
     @pre_terminal = @junctions[[@n_rows - 1, @n_cols - 2]].first[0]
-  end
-
-  def find_junctions
-    @junctions = {}
-    @junctions[[0,1]] = []
-    (1..@n_rows-2).each do |x|
-      (1..@n_cols-2).each do |y|
-        neighbors = 0
-        [[x-1, y], [x+1, y], [x, y-1], [x, y+1]].map do |nx, ny|
-          neighbors += 1 if @map[nx][ny] != "#"
-        end
-        @junctions[[x,y]] = [] if neighbors > 2
-      end
-    end
-    @junctions[[@n_rows - 1, @n_cols - 2]] = []
+    @last_distance = @junctions[[@n_rows - 1, @n_cols - 2]].first[1]
   end
 
   def next_steps(x, y)
