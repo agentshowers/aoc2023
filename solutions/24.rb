@@ -79,28 +79,3 @@ class Day24 < Base
     (x - stone[0][0]) * stone[1][0] < 0 || (y - stone[0][1]) * stone[1][1] < 0
   end
 end
-
-
-
-# t0 = Z3.Int('t0')
-# t1 = Z3.Int('t1')
-# x = Z3.Real('x')
-# y = Z3.Real('y')
-# z = Z3.Real('z')
-# ax = Z3.Real('ax')
-# ay = Z3.Real('ay')
-# az = Z3.Real('az')
-
-# solver.assert(t0 >= 0)
-# solver.assert(t1 >= 0)
-
-# solver.assert(19 + -2*t0 == x + ax*t0)
-# solver.assert(13 +  1*t0 == y + ay*t0)
-# solver.assert(30 + -2*t0 == z + az*t0)
-
-# solver.assert(18 + -1*t1 == x + ax*t1)
-# solver.assert(19 + -1*t1 == y + ay*t1)
-# solver.assert(22 + -2*t1 == z + az*t1)
-
-# 19, 13, 30 @ -2,  1, -2
-# 18, 19, 22 @ -1, -1, -2
