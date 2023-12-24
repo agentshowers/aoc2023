@@ -50,7 +50,7 @@ def pretty_print(solutions)
 end
 
 
-range = (23..DAYS)
+range = (1..DAYS)
 
 puts "******************************************************************"
 puts "*                                                                *"

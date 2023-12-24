@@ -49,7 +49,7 @@ class Day24 < Base
 
     if solver.satisfiable?
       model = solver.model
-      model[x].to_s.to_i + model[y].to_s.to_i + model[z].to_s.to_i
+      model[x].to_i + model[y].to_i + model[z].to_i
     else
       "oh shit"
     end
