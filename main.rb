@@ -5,7 +5,7 @@ require 'optparse'
 require 'uri'
 require 'net/http'
 
-DAYS = 23
+DAYS = 24
 
 def solve(range)
   range.map do |n|
@@ -50,7 +50,7 @@ def pretty_print(solutions)
 end
 
 
-range = (1..DAYS)
+range = (23..DAYS)
 
 puts "******************************************************************"
 puts "*                                                                *"
